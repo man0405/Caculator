@@ -1,12 +1,14 @@
+import java.util.ArrayList;
+
 public class App extends javax.swing.JFrame {
     private int result = 0;
     private String display = "";
-    private int[] containtNumber = new int[100];
+    private int[] containtNumber = new int[15];
     private int countCellNumber = 0;
-    private String[] containFunction = new String[100];
+    private ArrayList<String> containFunction = new ArrayList<String>();
     private int countCellFunctions = 0;
+    private int temp = 0;
     private int setNumber;
-    private char eventCheck;
 
     public static String removeCharAt(String s, int pos) {
         return s.substring(0, pos) + s.substring(pos + 1);
@@ -515,6 +517,21 @@ public class App extends javax.swing.JFrame {
         pack();
     }
 
+    // Sort the storeNumberOfCells
+    private void sortStoreNumberOfCells(int n) {
+        for (int i = n; i < containtNumber.length; i++) {
+            containtNumber[i] = containtNumber[i + 1];
+        }
+    }
+
+    // Sort the storeFunction
+    private void sortStoreFunction(int n) {
+        // for (int i = n; i < containFunction.length; i++) {
+        // containFunction[i] = containFunction[i + 1];
+        // }
+        containFunction.remove(n);
+    }
+
     // Store number of cells
     private void storeNumberOfCells(int setNumber) {
         containtNumber[countCellNumber] = setNumber;
@@ -524,8 +541,74 @@ public class App extends javax.swing.JFrame {
 
     // Store function
     private void storeFunction(String function) {
-        containFunction[countCellFunctions] = function;
+        // containFunction[countCellFunctions] = function;
+        containFunction.add(function);
         countCellFunctions++;
+    }
+
+    // Analysis * and /
+    private void analyze() {
+        // for (int i = temp; i < containtNumber.length; i++) {
+        // if (containFunction[i] == "*" || containFunction[i] == "/") {
+        // temp = i;
+        // }
+        // }
+        for (String string : containFunction) {
+            if (string == "*" || string == "/") {
+                temp = containFunction.indexOf(string);
+            }
+        }
+    }
+
+    // Analysis + and -
+    private void analyze2() {
+        // for (int i = temp; i < containtNumber.length; i++) {
+        // if (containFunction[i] == "+" || containFunction[i] == "-") {
+        // temp = i;
+        // }
+        // }
+        for (String string : containFunction) {
+            if (string == "+" || string == "-") {
+                temp = containFunction.indexOf(string);
+            }
+        }
+
+    }
+
+    // Solving * and /
+    private void solve() {
+        while (true) {
+            if (temp != 0) {
+                switch (containFunction.get(temp)) {
+                    case "*":
+                        containtNumber[temp] = containtNumber[temp] * containtNumber[temp + 1];
+                        sortStoreNumberOfCells(temp);
+                        sortStoreFunction(temp);
+                        break;
+                    case "/":
+                        containtNumber[temp] = containtNumber[temp] / containtNumber[temp + 1];
+                        sortStoreNumberOfCells(temp);
+                        sortStoreFunction(temp);
+                        break;
+                }
+            } else {
+                break;
+            }
+        }
+    }
+
+    // Solving + and -
+    private void solve2() {
+        while (true) {
+            if (temp != 0) {
+                switch (containFunction.get(temp)) {
+                    case "+":
+                        sortStoreFunction(temp);
+                    case "-":
+                        containtNumber[temp] = -containtNumber[temp];
+                }
+            }
+        }
     }
 
     // ActionEvent Delete
@@ -547,7 +630,6 @@ public class App extends javax.swing.JFrame {
         display = display + "+";
         storeFunction("+");
         lblDisplay.setText(display);
-        eventCheck = 'p';
 
     }
 
@@ -556,7 +638,6 @@ public class App extends javax.swing.JFrame {
         display = display + "-";
         storeFunction("-");
         lblDisplay.setText(display);
-        eventCheck = 'm';
 
     }
 
@@ -566,7 +647,6 @@ public class App extends javax.swing.JFrame {
         storeFunction("*");
         lblDisplay.setText(display);
         setNumber = 1;
-        eventCheck = 't';
 
     }
 
@@ -576,25 +656,15 @@ public class App extends javax.swing.JFrame {
         storeFunction("/");
         lblDisplay.setText(display);
         setNumber = 1;
-        eventCheck = 'd';
 
     }
 
     private void btnEqualActionPerformed(java.awt.event.ActionEvent evt) {
         storeNumberOfCells(setNumber);
-        switch (eventCheck) {
-            case 'p':
-                result += setNumber;
-                break;
-            case 'm':
-                result -= setNumber;
-                break;
-            case 't':
-                result *= setNumber;
-                break;
-            case 'd':
-                result /= setNumber;
-                break;
+        solve();
+        solve2();
+        for (int i = 0; i < containtNumber.length; i++) {
+            result += containtNumber[i];
         }
         lblDisplay.setText(result + "");
 
